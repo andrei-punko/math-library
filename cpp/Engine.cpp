@@ -1,9 +1,9 @@
 
 /*
 ----------------------------------------------------------------------------------------
-	Файл:						Engine.cpp
-	Версия:						1.06
-	Дата последней модификации:	11.01.2004
+	Файл:		Engine.cpp
+	Версия:		1.08
+	DLM:		11.04.2004
 ----------------------------------------------------------------------------------------
 */
 
@@ -13,7 +13,8 @@
 #include <math.h>
 
 #include "Engine.h"
-#include "Matrix.h"
+
+#define L(x1,x2) (fabs(x1-x2))
 
 void Progonka(const int N,
 			  const double *A, const double *B,
@@ -57,85 +58,6 @@ double Simpson(CInterval AB, double (*getF)(double))
 	return I;
 }
 
-double Simpson(CMatrix &M, const double h)
-{
-	CInterval AB(M.x(0), M.x(M.GetN()-1), h);
-	if(0 != AB.N()%2) AB.ReBorn(AB.X1(), AB.X2(), AB.N()+1);	//N должно быть четным
-
-	CMatrix *nM = Conversion(M, AB.N()+1);
-	double I = 0;
-	for(int i=1; i<AB.N(); i+=2) I += nM->y(i);
-	I *= 2;
-	for(i=2; i<=AB.N()-2; i+=2) I += nM->y(i);
-	I = h/3*( nM->y(0) + I*2 + nM->y(AB.N()) );
-	delete nM;
-
-	return I;
-}
-
-double Interpolation(CMatrix &M, const double x)
-{									//Предполагается, что пары (X;Y) упорядочены по x
-	int N = M.GetN()-1;
-	
-	assert(M.x(0)<=x && N>0 && x<=M.x(N));		//Проверка, принадлежности х интервалу интерполирования
-	
-	N++;
-	double h1, h2,
-	*A = new double[N],	*B = new double[N],
-	*C = new double[N],	*F = new double[N],
-	
-	*a = new double[N],	*b = new double[N],
-	*c = new double[N+1], *d = new double[N],
-	*L = new double[N];
-	assert(A!=0 && B!=0 && C!=0 && F!=0 && a!=0 && b!=0 && c!=0 && d!=0 && L!=0);
-	
-	N--;
-	
-	for(int i=1; i<N; i++)
-	{
-		h1 = A[i] = M.x(i) - M.x(i-1);
-		h2 = B[i] = M.x(i+1) - M.x(i);
-
-		C[i] = -2*(h1 + h2);
-		F[i] = 3*( (M.y(i)-M.y(i-1))/h1 - (M.y(i+1)-M.y(i))/h2 );
-	}
-	Progonka(N, A, B, C, F, 0, 0, 0, 0, L);		//Методом прогонки решаем систему
-	for(i=0; i<=N; i++) c[i+1] = L[i];
-		
-	delete []A; delete []B; delete []C; delete []F;	delete []L;
-
-	for(i=1; i<=N; i++)
-	{
-		a[i] = M.y(i-1);
-		h1 = M.x(i) - M.x(i-1);
-		b[i] = (M.y(i) - M.y(i-1))/h1 - h1/3*(c[i+1] + 2*c[i]);
-		d[i] = (c[i+1] - c[i])/(3*h1);
-	}
-
-	for(i=1; M.x(i)<x; i++);	//Поиск интервала [x_i-1; x_i], содержащего х
-
-	h1 = x-M.x(i-1);
-	h2 = a[i] + h1*(b[i] + h1*(c[i] + h1*d[i]));
-	delete []a; delete []b; delete []c; delete []d;
-
-	return h2;
-}
-
-CMatrix* Conversion(CMatrix &M, const int size)
-{
-	CMatrix *nM = new CMatrix(2, size);
-
-	CInterval AB(nM->x(0) = M.x(0), nM->x(size-1) = M.x(M.GetN()-1), size-1);
-	
-	for(int i=0; i<size; i++)
-	{
-		nM->x(i) = AB.X(i);
-		nM->y(i) = Interpolation(M, AB.X(i));
-	}
-	
-	return nM;
-}
-
 void Save(CInterval &AB, double (*getF)(double), const char *fname)
 {
 	ofstream f(fname);
@@ -155,7 +77,7 @@ void CInterval::ReBorn(const double X1, const double X2, const int N)
 	x1 = X1; x2 = X2; n = N; h = (x2-x1)/(double)n;
 }
 
-double CInterval::X(const int i)
+double CInterval::X(int i)
 {
 	assert(i>=0 && i<=n);
 	return x1 + i*h;
@@ -212,7 +134,6 @@ CMatrix* mSOLVE(CMatrix &A, CMatrix &B)
 double mDET(CMatrix &A)
 {
 	int Size = A.GetM();
-
 	assert(A.GetN() == Size);
 
 	int NSw = 0; //Количество перестановок строк
@@ -248,4 +169,114 @@ int CInterval::i(const double x)
 {
 	assert(x1<=x && x<=x2);
 	return (int)( (x-x1)/h );
+}
+
+double Min(CInterval AB, double(*f)(double))
+{
+	double x[4];
+	x[0] = AB.X1(); x[2] = AB.X2();
+	x[1] = x[0] + 2/(3+sqrt(5))*(x[2]-x[0]);
+
+	while(x[2]-x[0]>AB.H())
+	{
+		x[3] = x[0]+x[2]-x[1];	
+		int	m_i = 0, f_i = 0;
+	
+		//поиск минимальной из 4 точек
+		for(int i=1; i<4; i++) if(f(x[i])<f(x[m_i])) m_i = i;
+
+		//поиск наиболее удаленной от минимума точки
+		for(i=1; i<4; i++) if(L(x[m_i],x[i]) > L(x[m_i],x[f_i])) f_i = i;
+
+		//перенумеровываем точки, чтобы наиболее удаленная стала 4-й
+		if(f_i!=3) x[f_i] = x[3];
+
+		//упорядочение
+		double d;
+
+		for(m_i=0; m_i<=1; m_i++)
+		{
+			int min = m_i;
+			for(i=1; i<=2; i++) if(x[i]<x[m_i]) min = i;
+
+			d = x[min];
+			x[min] = x[m_i];
+			x[m_i] = d;
+		}
+	}
+	return 0.5*(x[2]+x[0]);
+}
+
+//---------------------------------------------------------------
+
+CMatrix::CMatrix(const int m, const int n)
+{
+	assert(m>=1 && n>=1);
+	pData = new double[(M = m)*(N = n)];
+	assert(pData!=0);
+}
+
+double& CMatrix::get(const int m, const int n)
+{
+	assert(m<M && n<N && m>=0 && n>=0);
+	return *(pData + m*N + n);
+}
+
+void CMatrix::Save(const char *fname)
+{
+	ofstream f(fname);
+	for(int i=0; i<M; i++)
+	{
+		for(int j=0; j<N; j++)	f<< get(i,j) <<" ";
+		f << "\n";
+	}
+	f.close();
+}
+
+void CMatrix::SwapLines(int m1, int m2)
+{
+	assert(m1<M && m2<M && m1>=0 && m2>=0);
+	
+	double el;
+	for(int i=0; i<N; i++)
+	{
+		el = *(pData + m1*N + i);
+		*(pData + m1*N + i) = *(pData + m2*N + i);
+		*(pData + m2*N + i) = el;
+	}
+}
+
+void CMatrix::SwapCols(int n1, int n2)
+{
+	assert(n1<N && n2<N && n1>=0 && n2>=0);
+
+	double el;
+	for(int i=0; i<N; i++)
+	{
+		el = *(pData + i*N + n1);
+		*(pData + i*N + n1) = *(pData + i*N + n2);
+		*(pData + i*N + n2) = el;
+	}
+}
+
+const CMatrix &CMatrix::operator=(const CMatrix &right)
+{
+	if(&right != this)
+	{
+		delete []pData;
+		pData = new double[(M = right.M)*(N = right.N)];
+		assert(pData!=0);
+
+		for(int i=0; i<M; i++)
+		for(int j=0; j<N; j++)
+			*(pData + i*N + j) = *(right.pData + i*N + j);
+	}
+	return *this;
+}
+
+void CMatrix::Clear()
+{
+	for(int i=0; i<M; i++)
+	for(int j=0; j<N; j++)
+		get(i,j) = 0;
 }

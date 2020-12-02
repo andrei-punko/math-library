@@ -2,8 +2,8 @@
 /*
 -------------------------------------------------------------------------------------------
 	Файл:		Approx.h
-	Версия:		1.00
-	DLM:		11.01.2004
+	Версия:		1.01
+	DLM:		25.01.2004
 
 	Цель:		Аппроксимация функции, заданной таблично, с заданным среднеквадратичым
 				отклонением при помощи произвольного набора функций.
@@ -28,28 +28,18 @@ typedef double (*Fk)(int, double);
 class CApprox
 {
 public:
-	CApprox(CMatrix &m, Fk F, double Eps);
+	CApprox(CMatrix &m, Fk F);
 	~CApprox();
 	
-	double getF(double x, int n);
-	double getF(double x) {	return getF(x, best.n); };
+	void Approximate(int _n);
+	double getF(double x);
+	double getDelta();
+	void Save(CInterval &AB, char *fname);
 	
-	double getDelta(int n);
-
-	double getBdelta() { return best.delta; };
-	int getBn() { return best.n; };
-
-	void Save(CInterval &AB, const char *fname);
-
 private:
-	void Approximate(int n);
-	
 	CMatrix M, *Ak;
 	Fk getFk;
-	struct {
-		int n;
-		double delta;
-	} best;
+	int n;
 };
 
 #endif
