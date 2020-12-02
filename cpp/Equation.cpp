@@ -2,8 +2,8 @@
 /*
 ------------------------------------------------------------------------------------------------------
 	Файл:		Equation.cpp
-	Версия:		1.09
-	DLM:		18.02.2005
+	Версия:		1.10
+	DLM:		16.03.2005
 ------------------------------------------------------------------------------------------------------
 */
 
@@ -17,27 +17,52 @@
 void SolveODU(CInterval AB, double U0, double (*fn)(double, double), char *fname)
 {
 	double
-		*U = new double[AB.N()],
-		h = AB.H();
-	assert(U!=0);
-	U[0] = U0;
+		x = AB.X(0),
+		U = U0,
+		h = AB.H(),
+		k1,k2,k3,k4;
 
-	double k1,k2,k3,k4,x;
+	ofstream f(fname); f<< x <<" "<< U <<"\n";
+
 	for(int i=0; i<AB.N()-1; i++)
 	{
 		x = AB.X(i);
-		k1 = fn(x, U[i]);
-		k2 = fn(x + h/2., U[i] + h*k1/2.);
-		k3 = fn(x + h/2., U[i] + h*k2/2.);
-		k4 = fn(x + h, U[i] + h*k3);
-		U[i+1] = U[i] + h/6.*( k1+2.*( k2+k3 )+k4 );
-	}
+		k1 = fn(x, U);
+		k2 = fn(x + h/2., U + h*k1/2.);
+		k3 = fn(x + h/2., U + h*k2/2.);
+		k4 = fn(x + h, U + h*k3);
 
-	ofstream f(fname);
-	for(i=0; i<AB.N(); i++) f << AB.X(i) <<" "<< U[i] <<"\n";
+		f<< x <<" "<< (U += h/6.*( k1+2*(k2+k3)+k4 )) <<"\n";
+	}
+	f.close();
+}
+
+void SolveODU(CInterval AB, double *U0, double (*fn)(double, double *, int), int N, char *fname)
+{
+	double
+		*tU = new double[N],
+		*dU = new double[N],
+		*U = new double[N],
+		h = AB.H(),x;
+	
+	assert(tU!=0 && dU!=0 && U!=0);
+
+	ofstream f(fname); f<< AB.X(0);
+	for(int i=0; i<N; i++) f<<" "<< (U[i] = U0[i]);
+
+	f<<"\n";
+
+	for(i=0; i<AB.N()-1; i++)
+	{
+		f<< (x = AB.X(i));
+		for(int k=0; k<N; k++) dU[k] = h*fn(x,U,k);
+		for(int j=0; j<N; j++) f<<" "<< (U[j] += dU[j]);
+
+		f<<"\n";
+	}
 	f.close();
 
-	delete []U;
+	delete []tU; delete []dU; delete []U;
 }
 
 CEqn::CEqn(double x1, double x2, double t2, int l, int r, double lH, double rH)
@@ -54,8 +79,7 @@ CEqn::CEqn(double x1, double x2, double t2, int l, int r, double lH, double rH)
 CEqn::~CEqn()
 {
 	if(flag) delete Arr;
-	delete D.x;
-	delete D.t;
+	delete D.x;	delete D.t;
 }
 
 

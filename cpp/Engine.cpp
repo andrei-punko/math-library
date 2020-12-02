@@ -2,8 +2,8 @@
 /*
 ----------------------------------------------------------------------------------------
 	Файл:		Engine.cpp
-	Версия:		1.10
-	DLM:		18.02.2005
+	Версия:		1.11
+	DLM:		14.03.2005
 ----------------------------------------------------------------------------------------
 */
 
@@ -75,13 +75,17 @@ double CInterval::X(int i)
 	return x1 + i*h;
 }
 
-CMatrix* mSOLVE(CMatrix &A, CMatrix &B)
+CMatrix* mSOLVE(CMatrix &a, CMatrix &b)
 {
-	int Size = A.GetM();
-	assert(A.GetN() == Size && B.GetM() == Size);
+	int Size = a.GetM();
+	assert(a.GetN() == Size && b.GetM() == Size);
 
-	CMatrix *X = new CMatrix(Size);
+	CMatrix
+		*X = new CMatrix(Size),
+		A(Size,Size), B(Size);
 	assert(X!=0);
+
+	A = a; B = b;	//Создаем копии матриц, т.к. над проводим действия
 
 	//Приведение матрицы к треугольному виду
 	for(int Curr=0; Curr<Size; Curr++)
@@ -121,6 +125,27 @@ CMatrix* mSOLVE(CMatrix &A, CMatrix &B)
 	}
 		
 	return X;
+}
+
+CMatrix* mINV(CMatrix &A)
+{
+	int Size = A.GetM();
+	assert(Size == A.GetN());
+
+	CMatrix
+		E(Size),
+		*invA = new CMatrix(Size,Size),
+		*tM;
+	
+	for(int i=0; i<Size; i++)
+	{
+		E.Clear(); E.get(i) = 1;
+		
+		tM = mSOLVE(A,E);
+		for(int j=0; j<Size; j++) invA->get(j,i) = tM->get(j);
+		delete tM;
+	}
+	return invA;
 }
 
 double mDET(CMatrix &A)
