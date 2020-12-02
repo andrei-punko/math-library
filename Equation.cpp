@@ -1,10 +1,10 @@
 
 /*
-----------------------------------------------------------------------------------------
+------------------------------------------------------------------------------------------------------
 	Файл:		Equation.cpp
-	Версия:		1.02
-	DLM:		10.11.2003
-----------------------------------------------------------------------------------------
+	Версия:		1.05
+	DLM:		04.01.2004
+------------------------------------------------------------------------------------------------------
 */
 
 #include <iostream.h>
@@ -20,6 +20,7 @@ void SolveODU(CInterval AB, const double U0, double (*fn)(double, double), const
 	double
 		*U = new double[AB.N()],
 		h = AB.H();
+	assert(U!=0);
 	U[0] = U0;
 
 	double k1,k2,k3,k4,x;
@@ -43,14 +44,11 @@ void SolveODU(CInterval AB, const double U0, double (*fn)(double, double), const
 CEquation::CEquation(const double x1, const double x2, const double t2,
 					 const int l, const int r, const double lH, const double rH)
 {
-	if(l<1 || l>3 || r<1 || r>3 || !(lH>0 && rH>0))
-	{
-		cout << "CEquation::CEquation(): error\n";
-		exit(EXIT_FAILURE);
-	}
+	assert(l>=1 && l<=3 && r>=1 && r<=3 && lH>0 && rH>0);
 
 	x12 = new CInterval(x1, x2, 1);
 	t12 = new CInterval(0, t2, 1);
+	assert(x12!=0 && t12!=0);
 	
 	flag = false; lbt = l; rbt = r; lh = lH; rh = rH;
 }
@@ -69,12 +67,14 @@ void CEquation::Solve(const double h, const double tau)
 	
 	if(flag) delete Arr;
 	Arr = new CMatrix<double>(t12->N()+1, x12->N()+1); flag = true;
+	assert(Arr!=0);
 
 	int N = x12->N();
 	double
 		*A = new double[N],	*B = new double[N],
 		*C = new double[N],	*F = new double[N],
 		*U = new double[N+1];
+	assert(A!=0 && B!=0 && C!=0 && F!=0 && U!=0);
 	
 	for(int i=1; i<N; i++) Arr->get(0,i) = GetU0(x12->X(i));
 	Arr->get(0,0) = GetLeftU(0);
@@ -130,32 +130,70 @@ void CEquation::Solve(const double h, const double tau)
 
 void CEquation::SaveT(const char *fname, const double t)
 {
-	if(flag && t12->X1()<=t && t<=t12->X2())
+	double tArr[1] = {t};
+	SaveT(fname, tArr, 1);
+}
+
+void CEquation::SaveT(const char *fname, const double t[], const int size)
+{
+	for(int i=0; i<size; i++) assert(t[i]>=t12->X1() && t[i]<=t12->X2() && flag);
+
+	ofstream f(fname);
+	for(i=0; i<=x12->N(); i++)
 	{
-		int index = (int)( t/t12->H() );
-		
-		ofstream f(fname);
-		for(int i=0; i<=x12->N(); i++) f<< x12->X(i) <<" "<< Arr->get(index,i) <<"\n";
-		f.close();
-	} else
-	{
-		cout << "CEquation::SaveT(): error\n";
-		exit(EXIT_FAILURE);
+		f<< x12->X(i);
+		for(int j=0; j<size; j++) f	<<" "<<Arr->get((int)( t[j]/t12->H() ),i);
+		f<<"\n";
 	}
+	f.close();
 }
 
 void CEquation::SaveX(const char *fname, const double x)
 {
-	if(x12->X1()<=x && x<=x12->X2())
-	{
-		int index = (int)( x/x12->H() );
+	double xArr[1] = {x};
+	SaveX(fname, xArr, 1);
+}
 
-		ofstream f(fname);
-		for(int i=0; i<=t12->N(); i++) f<< t12->X(i) <<" "<< Arr->get(i,index) <<"\n";
-		f.close();
-	} else
+void CEquation::SaveX(const char *fname, const double x[], const int size)
+{
+	for(int i=0; i<size; i++) assert(x[i]>=x12->X1() && x[i]<=x12->X2() && flag);
+
+	ofstream f(fname);
+	for(i=0; i<=t12->N(); i++)
 	{
-		cout << "CEquation::SaveX(): error\n";
-		exit(EXIT_FAILURE);
+		f<< t12->X(i);
+		for(int j=0; j<size; j++) f	<<" "<<Arr->get(i,(int)( x[j]/x12->H() ));
+		f<<"\n";
 	}
+	f.close();
+}
+
+CMatrix<double>* CEquation::GetU_t(const double t)
+{
+	CMatrix<double> *M = new CMatrix<double>(2, Arr->GetN());
+	assert(M!=0);
+	int index = t12->i(t);
+	assert(index>=0 && index<=Arr->GetM()-1);
+
+	for(int i=0; i<Arr->GetN(); i++)
+	{
+		M->get(0,i) = x12->X(i);
+		M->get(1,i) = Arr->get(index,i);
+	}
+	return M;
+}
+
+CMatrix<double>* CEquation::GetU_x(const double x)
+{
+	CMatrix<double> *M = new CMatrix<double>(2, Arr->GetM());
+	assert(M!=0);
+	int index = x12->i(x);
+	assert(index>=0 && index<=Arr->GetN()-1);
+
+	for(int i=0; i<Arr->GetM(); i++)
+	{
+		M->get(0,i) = t12->X(i);
+		M->get(1,i) = Arr->get(i,index);
+	}
+	return M;
 }

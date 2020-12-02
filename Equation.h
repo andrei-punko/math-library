@@ -2,8 +2,8 @@
 /*
 ------------------------------------------------------------------------------------------------
 	Файл:		Equation.h
-	Версия:		1.02
-	DLM:		10.11.2003
+	Версия:		1.03
+	DLM:		17.12.2003
 
 	Цель:		Решение дифференциальных уравнений
 
@@ -49,7 +49,13 @@ public:
 
 	void Solve(const double h, const double tau);
 	void SaveT(const char *fname, const double t);
+	void SaveT(const char *fname, const double t[], const int size);
+
 	void SaveX(const char *fname, const double x);
+	void SaveX(const char *fname, const double x[], const int size);
+
+	CMatrix<double>* CEquation::GetU_t(const double t);
+	CMatrix<double>* CEquation::GetU_x(const double x);
 
 private:
 	CInterval *x12, *t12;

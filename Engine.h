@@ -1,10 +1,12 @@
 
-/*----------------------------------------------------------------------------------------------
+/*
+------------------------------------------------------------------------------------------------
 	File:		Engine.h
-	Version:	1.04
-	DLM:		10.11.2003
+	Version:	1.05
+	DLM:		17.12.2003
 
 	Цель:		-
+
 	Описание:
 	1.Класс CInterval инкапсулирует интервал [x1; x2], шаг h на нем, число кусков N,
 		на которые он разбивается шагом h.
@@ -15,7 +17,8 @@
 	6.Табулирование функции на заданном интервале и сохранение результатов в файл.
 	7.Решение системы линейных уравнений методом Гаусса с выбором главного элемента.
 	8.Вычисление определителя матрицы (приведением ее к треугольной).
-----------------------------------------------------------------------------------------------*/
+------------------------------------------------------------------------------------------------
+*/
 
 #ifndef ENGINE_H
 #define ENGINE_H
@@ -39,6 +42,8 @@ public:
 	double H() { return h; };
 	int N() { return n; };
 
+	int i(const double x);
+
 private:
 	double x1, x2, h;
 	int n;
@@ -55,27 +60,27 @@ void Progonka(const int N,
 
 //	Интегрирование
 //
-double Simpson(CMatrix<double> &M, const double h);
+double Simpson(CMatrix &M, const double h);
 double Simpson(CInterval AB, double (*getF)(double));
 
 //	Интерполяция
 //
-double Interpolation(CMatrix<double> &M, const double x);
+double Interpolation(CMatrix &M, const double x);
 
 //	Изменение количества точек, задающих функцию
 //
-CMatrix<double>* Conversion(CMatrix<double> &M, const int size);
+CMatrix* Conversion(CMatrix &M, const int size);
 
 //	Табулирование
 //
-void Save(CInterval AB, double (*getF)(double), const char *fname);
+void Save(CInterval &AB, double (*getF)(double), const char *fname);
 
 //	Метод Гаусса
 //
-CMatrix<double>* mSOLVE(CMatrix<double> &A, CMatrix<double> &B);
+CMatrix* mSOLVE(CMatrix &A, CMatrix &B);
 
 //	Вычисление определителя
 //
-double mDET(CMatrix<double> &A);
+double mDET(CMatrix &A);
 
 #endif
