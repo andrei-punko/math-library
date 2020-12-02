@@ -19,6 +19,7 @@
 #include "Equation.h"
 #include "Polynomial.h"
 #include "TabFunc.h"
+#include "Random.h"
 
 main()
 {
