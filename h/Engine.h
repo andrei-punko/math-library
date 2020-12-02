@@ -2,8 +2,8 @@
 /*
 ------------------------------------------------------------------------------------------------
 	File:		Engine.h
-	Version:	1.07
-	DLM:		11.04.2004
+	Version:	1.08
+	DLM:		18.02.2005
 
 	Цель:		-
 	Описание:
@@ -85,15 +85,11 @@ void Progonka(const int N,
 
 //	Интегрирование
 //
-double Simpson(CInterval AB, double (*getF)(double));
-
-//	Табулирование
-//
-void Save(CInterval &AB, double (*getF)(double), const char *fname);
+double Simpson(CInterval &AB, double (*getF)(double));
 
 //	Поиск минимума
 //
-double Min(CInterval AB, double(*f)(double));
+double Min(CInterval &AB, double(*f)(double));
 
 //	Метод Гаусса
 //
@@ -102,5 +98,17 @@ CMatrix* mSOLVE(CMatrix &A, CMatrix &B);
 //	Вычисление определителя
 //
 double mDET(CMatrix &A);
+
+//	Табулирование функции на заданном интервале и сохранение результатов в файл
+//
+void Save(CInterval &AB, double (*func)(double), char *fname);
+
+//	То же, но func(int) возвращает значение по индексу
+//
+void Save(CInterval &AB, double (*func)(int), char *fname);
+
+//	Табулирование параметрической функции
+//
+void Save(CInterval &t, double (*x)(double), double (*func)(double), char *fname);
 
 #endif

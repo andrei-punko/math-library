@@ -2,13 +2,12 @@
 /*
 ----------------------------------------------------------------------------------------
 	Файл:		Engine.cpp
-	Версия:		1.08
-	DLM:		11.04.2004
+	Версия:		1.10
+	DLM:		18.02.2005
 ----------------------------------------------------------------------------------------
 */
 
 #include <assert.h>
-#include <iostream.h>
 #include <fstream.h>
 #include <math.h>
 
@@ -43,7 +42,7 @@ void Progonka(const int N,
 	delete []Beta;
 }
 
-double Simpson(CInterval AB, double (*getF)(double))
+double Simpson(CInterval &AB, double (*getF)(double))
 {
 	if(0 != (AB.N())%2) AB.ReBorn(AB.X1(), AB.X2(), AB.N()+1);	//N должно быть четным
 
@@ -51,18 +50,11 @@ double Simpson(CInterval AB, double (*getF)(double))
 	for(int i=1; i<AB.N(); i+=2) I += getF( AB.X(i) );
 	I *= 2;
 	for(i=2; i<=AB.N()-2; i+=2) I += getF( AB.X(i) );
-	I = AB.H()/3*(
+	I = AB.H()/3.*(
 		getF(AB.X1()) + I*2 + getF(AB.X2())
 		);
 
 	return I;
-}
-
-void Save(CInterval &AB, double (*getF)(double), const char *fname)
-{
-	ofstream f(fname);
-	for(int i=0; i<=AB.N(); i++) f<< AB.X(i) <<" "<< getF(AB.X(i)) <<"\n";
-	f.close();
 }
 
 void CInterval::ReBorn(const double X1, const double X2, const double H)
@@ -171,7 +163,7 @@ int CInterval::i(const double x)
 	return (int)( (x-x1)/h );
 }
 
-double Min(CInterval AB, double(*f)(double))
+double Min(CInterval &AB, double(*f)(double))
 {
 	double x[4];
 	x[0] = AB.X1(); x[2] = AB.X2();
@@ -207,8 +199,29 @@ double Min(CInterval AB, double(*f)(double))
 	return 0.5*(x[2]+x[0]);
 }
 
-//---------------------------------------------------------------
+void Save(CInterval &AB, double (*func)(int), char *fname)
+{
+	ofstream f(fname);
+	for(int i=0; i<=AB.N(); i++) f<< AB.X(i) <<" "<< func(i) <<"\n";
+	f.close();
+}
 
+void Save(CInterval &AB, double (*func)(double), char *fname)
+{
+	ofstream f(fname);
+	for(int i=0; i<=AB.N(); i++) f<< AB.X(i) <<" "<< func(AB.X(i)) <<"\n";
+	f.close();
+}
+
+void Save(CInterval &t, double(*x)(double), double (*func)(double), char *fname)
+{
+	ofstream f(fname);
+	for(int i=0; i<=t.N(); i++) f<< x( t.X(i) )<<" "<< func( t.X(i) ) <<"\n";
+	f.close();
+}
+
+//---------------------------------------------------------------
+//
 CMatrix::CMatrix(const int m, const int n)
 {
 	assert(m>=1 && n>=1);
@@ -277,6 +290,5 @@ const CMatrix &CMatrix::operator=(const CMatrix &right)
 void CMatrix::Clear()
 {
 	for(int i=0; i<M; i++)
-	for(int j=0; j<N; j++)
-		get(i,j) = 0;
+	for(int j=0; j<N; j++) get(i,j) = 0;
 }
