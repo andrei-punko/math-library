@@ -2,8 +2,8 @@
 /*
 ----------------------------------------------------------------------------------------
 	Файл:		Engine.cpp
-	Версия:		1.11
-	DLM:		14.03.2005
+	Версия:		1.12
+	DLM:		28.06.2005
 ----------------------------------------------------------------------------------------
 */
 
@@ -13,7 +13,8 @@
 
 #include "Engine.h"
 
-#define L(x1,x2) (fabs(x1-x2))
+#define L(x1,x2)	(fabs(x1-x2))
+#define SIGN(d)		(d<0 ? -1 : 1)
 
 void Progonka(const int N,
 			  const double *A, const double *B,
@@ -316,4 +317,11 @@ void CMatrix::Clear()
 {
 	for(int i=0; i<M; i++)
 	for(int j=0; j<N; j++) get(i,j) = 0;
+}
+
+double Round(double d)
+{
+	int r = (int)d;
+	if(fabs(d-r) > 0.5) return r += SIGN(d);
+	return r;
 }
