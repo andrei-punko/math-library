@@ -73,26 +73,24 @@ CEqn::CEqn(double x1, double x2, double t2, int l, int r, double lH, double rH)
 	D.t = new CInterval(0, t2, 1);
 	assert(D.x!=0 && D.t!=0);
 	
-	flag = false; lbt = l; rbt = r; lh = lH; rh = rH;
+	lbt = l; rbt = r; lh = lH; rh = rH;
 }
 
 CEqn::~CEqn()
 {
-	if(flag) delete Arr;
 	delete D.x;	delete D.t;
 }
 
 
 void CEqn::sUt(char *fname, double t[], int size)
 {
-	assert(flag);
 	for(int i=0; i<size; i++) assert(t[i]>=D.t->X1() && t[i]<=D.t->X2());
 
 	ofstream f(fname);
 	for(i=0; i<=D.x->N(); i++)
 	{
 		f<< D.x->X(i);
-		for(int j=0; j<size; j++) f<<" "<< Arr->get(D.t->i(t[j]),i);
+		for(int j=0; j<size; j++) f<<" "<< Arr(D.t->i(t[j]),i);
 		f<<"\n";
 	}
 	f.close();
@@ -100,45 +98,42 @@ void CEqn::sUt(char *fname, double t[], int size)
 
 void CEqn::sUx(char *fname, double x[], int size)
 {
-	assert(flag);
 	for(int i=0; i<size; i++) assert(x[i]>=D.x->X1() && x[i]<=D.x->X2());
 
 	ofstream f(fname);
 	for(i=0; i<=D.t->N(); i++)
 	{
 		f<< D.t->X(i);
-		for(int j=0; j<size; j++) f<<" "<< Arr->get(i,D.x->i(x[j]));
+		for(int j=0; j<size; j++) f<<" "<< Arr(i,D.x->i(x[j]));
 		f<<"\n";
 	}
 	f.close();
 }
 
-CMatrix* CEqn::gUt(int it)
+void CEqn::gUt(int it, CMatrix &M)
 {
-	assert( it>=0 && it<Arr->GetN()	);
-	CMatrix *M = new CMatrix(2,Arr->GetN());
-	assert(M);
+	int N = Arr.GetN();
+	assert(it>=0 && it<N);
+	M.SetSize(2,N);
 
-	for(int i=0; i<Arr->GetN(); i++)
+	for(int i=0; i<N; i++)
 	{
-		M->get(0,i) = D.x->X(i);
-		M->get(1,i) = Arr->get(it,i);
+		M(0,i) = D.x->X(i);
+		M(1,i) = Arr(it,i);
 	}
-	return M;
 }
 
-CMatrix* CEqn::gUx(int ix)
+void CEqn::gUx(int ix, CMatrix &M)
 {
-	assert( ix>=0 && ix<Arr->GetN() );
-	CMatrix *M = new CMatrix(2,Arr->GetM());
-	assert(M);
+	int N = Arr.GetM();	
+	assert(ix>=0 && ix<N);
+	M.SetSize(2,N);
 
-	for(int i=0; i<Arr->GetM(); i++)
+	for(int i=0; i<N; i++)
 	{
-		M->get(0,i) = D.x->X(i);
-		M->get(1,i) = Arr->get(i,ix);
+		M(0,i) = D.x->X(i);
+		M(1,i) = Arr(i,ix);
 	}
-	return M;
 }
 
 void CEqn::Solve(double h, double tau)
@@ -149,14 +144,10 @@ void CEqn::Solve(double h, double tau)
 	D.t->ReBorn(D.t->X1(), D.t->X2(), tau);
 	
 	//выделение места под решение уравнени€
-	if(flag) delete Arr;
-	Arr = new CMatrix(D.t->N()+1, D.x->N()+1);
-	assert(Arr);
-
-	flag = true;
+	Arr.SetSize(D.t->N()+1, D.x->N()+1);
 
 	//задание начального значени€
-	for(int i=0; i<=D.x->N(); i++) Arr->get(0,i) = gU0(i);
+	for(int i=0; i<=D.x->N(); i++) Arr(0,i) = gU0(i);
 }
 
 void CParEqn::Solve(double h, double tau)
@@ -177,9 +168,9 @@ void CParEqn::Solve(double h, double tau)
 		for(int i=1; i<N; i++)
 		{
 			double
-				_u = Arr->get(j,i-1),
-				u = Arr->get(j,i),
-				u_ = Arr->get(j,i+1),
+				_u = Arr(j,i-1),
+				u = Arr(j,i),
+				u_ = Arr(j,i+1),
 
 				Alpha =	( gK(i,j,u) + gK(i+1,j,u_) + gV(i,j,u)*h )/2.,
 				Beta =	( gK(i,j,u) + gK(i-1,j,_u) - gV(i,j,u)*h )/2.,
@@ -210,7 +201,7 @@ void CParEqn::Solve(double h, double tau)
 		}
 
 		Progonka(N, A, B, C, F, Mu[1], Nu[1], Mu[2], Nu[2], U);
-		for(i=0; i<=N; i++) Arr->get(nj,i) = U[i];
+		for(i=0; i<=N; i++) Arr(nj,i) = U[i];
 	}
 	
 	delete []A; delete []B; delete []C; delete []F;	delete []U;
@@ -231,18 +222,18 @@ void CHypEqn::Solve(double h, double tau)
 	assert(A!=0 && B!=0 && C!=0 && F!=0 && U!=0);
 
 	//задание граничных значений на первом слое
-	Arr->get(1,0) = gLU(1);
-	Arr->get(1,N) = gRU(1);
+	Arr(1,0) = gLU(1);
+	Arr(1,N) = gRU(1);
 
 	//вычисление значени€ функции на первом слое дл€ запуска разностной схемы
 	for(int i=1; i<N; i++)
 	{
 		double
-			_u = Arr->get(0,i-1),
-			u = Arr->get(0,i),
-			u_ = Arr->get(0,i+1);
+			_u = Arr(0,i-1),
+			u = Arr(0,i),
+			u_ = Arr(0,i+1);
 
-		Arr->get(1,i) = u + tau*(gdU_dt(i) +
+		Arr(1,i) = u + tau*(gdU_dt(i) +
 							tau/(2.*gM(i,0,u))*( 
 							gK(i,0,u)/pow(h,2.)*(_u - 2.*u + u_) + gV(i,0,u)/(2.*h)*(u_ - _u) + gF(i,0,u) ));
 	}
@@ -253,9 +244,9 @@ void CHypEqn::Solve(double h, double tau)
 		for(i=1; i<N; i++)
 		{
 			double
-				_u = Arr->get(j,i-1),
-				u = Arr->get(j,i),
-				u_ = Arr->get(j,i+1),
+				_u = Arr(j,i-1),
+				u = Arr(j,i),
+				u_ = Arr(j,i+1),
 
 				Alpha =	gK(i,j,u) - gV(i,j,u)*h/2.,
 				Beta =	gK(i,j,u) + gV(i,j,u)*h/2.,
@@ -266,7 +257,7 @@ void CHypEqn::Solve(double h, double tau)
 			B[i] = Beta;
 			C[i] = Alpha + Beta - Gamma + Delta;
 			F[i] = _u*Alpha + u_*Beta - u*(Alpha + Beta + Gamma + Delta) +
-					2*( Arr->get(j+1,i)*Delta + gF(i,j,u)*pow(h,2) );
+					2*( Arr(j+1,i)*Delta + gF(i,j,u)*pow(h,2) );
 		}
 
 		int nj = j+2;
@@ -288,7 +279,7 @@ void CHypEqn::Solve(double h, double tau)
 		}
 
 		Progonka(N, A, B, C, F, Mu[1], Nu[1], Mu[2], Nu[2], U);
-		for(i=0; i<=N; i++) Arr->get(nj,i) = U[i];
+		for(i=0; i<=N; i++) Arr(nj,i) = U[i];
 	}
 
 	delete []A; delete []B; delete []C; delete []F;	delete []U;

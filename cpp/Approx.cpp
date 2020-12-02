@@ -18,13 +18,13 @@
 
 CApprox::CApprox(CMatrix &m, Fk F):getFk(F)
 {
-	assert((m.GetM()==3) && (m.GetN()>1));
+	assert(m.GetM()==3 && m.GetN()>1);
 	M = m; Ak = 0;
 }
 
 void CApprox::Approximate(int _n)
 {
-	if(Ak!=0) delete Ak;
+	if(!Ak) delete Ak;
 
 	n = _n;
 	CMatrix A(n+1, n+1), B(n+1);
@@ -34,10 +34,10 @@ void CApprox::Approximate(int _n)
 	{
 		for(int i=0; i<M.GetN(); i++)	//суммирование ряда
 		{
-			B.get(p) += M.get(2,i)*M.get(1,i)*getFk(p,M.get(0,i));
+			B(p) += M(2,i)*M(1,i)*getFk(p,M(0,i));
 
 			for(int k=0; k<=n; k++)	//цикл по столбцам
-				A.get(p, k) += M.get(2,i)*getFk(k, M.get(0,i))*getFk(p, M.get(0,i));
+				A(p, k) += M(2,i)*getFk(k, M(0,i))*getFk(p, M(0,i));
 		}
 	}
 	Ak = mSOLVE(A, B);
@@ -61,8 +61,8 @@ double CApprox::getDelta()
 	double s1 = 0, s2 = 0;
 	for(int i=0; i<M.GetN(); i++)
 	{
-		s1 += M.get(2,i)*pow(M.get(1,i) - getF(M.get(0,i)),2.0);
-		s2 += M.get(2,i);
+		s1 += M(2,i)*pow(M(1,i) - getF(M(0,i)),2.0);
+		s2 += M(2,i);
 	}
 	return pow(s1/s2, 0.5);
 }

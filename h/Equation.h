@@ -42,7 +42,7 @@ class CEqn
 {
 public:
 	struct Area { CInterval *x,*t; } D;
-	CMatrix	*Arr;
+	CMatrix	Arr;
 
 	CEqn(double x1, double x2, double t2, int l=1, int r=1, double lH=1., double rH=1.);
 	~CEqn();
@@ -67,11 +67,10 @@ public:
 	void sUx(char *fname, double x) { sUx(fname, &x, 1); }
 	void sUx(char *fname, double x[], int size);
 
-	CMatrix* gUt(int it);	//Получение среза U(x) при заданном t = t0
-	CMatrix* gUx(int ix);	//Получение среза U(t) при заданном х = x0
+	void gUt(int it, CMatrix &);	//Получение среза U(x) при заданном t = t0
+	void gUx(int ix, CMatrix &);	//Получение среза U(t) при заданном х = x0
 
 protected:					//Доступ к элементам этой секции имеют только элементы класса и его потомки
-	bool flag;
 	int lbt, rbt;
 	double lh, rh;
 

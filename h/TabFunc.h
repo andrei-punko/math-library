@@ -19,7 +19,7 @@
 #ifndef TABFUNC_H
 #define	TABFUNC_H
 
-#include "Matrix.h"
+#include "Engine.h"
 
 class CTabFunc
 {

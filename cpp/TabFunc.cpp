@@ -2,8 +2,8 @@
 /*
 ------------------------------------------------------------------------------------------------
 	Файл:		TabFunc.cpp
-	Версия:		1.01
-	DLM:		25.01.2004
+	Версия:		1.02
+	DLM:		13.08.2004
 ------------------------------------------------------------------------------------------------
 */
 
@@ -15,7 +15,8 @@
 
 CTabFunc::CTabFunc(CMatrix &m)
 {
-	assert(m.GetN()>1); M = m;	
+	assert(m.GetM()==2 && m.GetN()>=1);
+	M = m;
 	
 	CalcFactors();
 }
@@ -31,7 +32,7 @@ void CTabFunc::CalcFactors()
 	a = new double[N];	b = new double[N];
 	c = new double[N+1]; d = new double[N];
 	
-	assert(A!=0 && B!=0 && C!=0 && F!=0 && a!=0 && b!=0 && c!=0 && d!=0 && L!=0);
+	assert(A && B && C && F && L&& a && b && c && d);
 	N--;
 	
 	for(int i=1; i<N; i++)

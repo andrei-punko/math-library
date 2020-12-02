@@ -2,13 +2,13 @@
 /*
 ---------------------------------------------------------------------------------------------------
 	Файл:		Random.cpp
-	Версия:		1.01
-	DLM:		28.06.2005
+	Версия:		1.02
+	DLM:		09.08.2005
 ---------------------------------------------------------------------------------------------------
 */
 
-//	rand():			Алгоритм взят из книги "Numerical Recipes in C", с.279
-//	rand_norm():	Алгоритм взят из книги Кнут "Искусство программирования", раздел 3.4, с.4
+//	my_rand():			Алгоритм взят из книги "Numerical Recipes in C", с.279
+//	my_rand_norm():	Алгоритм взят из книги Кнут "Искусство программирования", раздел 3.4, с.4
 
 #include <math.h>
 #include <time.h>
@@ -25,12 +25,12 @@
 
 long SEED;
 
-void randomize()
+void my_randomize()
 { 
 	SEED = time(NULL);
 }
 
-double rand(double min, double max)
+double my_rand(double min, double max)
 {
 	assert(min<max);
 
@@ -47,13 +47,13 @@ double rand(double min, double max)
 	return min + ans*(max - min);
 }
 
-double rand_norm(double Mu0, double D)
+double my_rand_norm(double Mu0, double D)
 {
 	double v1,v2,s;
 	
 	do{
-		v1 = 2*rand(0,1) - 1;
-		v2 = 2*rand(0,1) - 1;
+		v1 = 2*my_rand(0,1) - 1;
+		v2 = 2*my_rand(0,1) - 1;
 		s = pow(v1,2) + pow(v2,2);
 	} while(s>=1);
 
