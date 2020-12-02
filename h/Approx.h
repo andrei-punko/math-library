@@ -2,14 +2,13 @@
 /*
 -------------------------------------------------------------------------------------------
 	Файл:		Approx.h
-	Версия:		1.01
-	DLM:		25.01.2004
+	Версия:		1.02
+	DLM:		17.08.2005
 
 	Цель:		Аппроксимация функции, заданной таблично, с заданным среднеквадратичым
 				отклонением при помощи произвольного набора функций.
 
-	Описание:	Конструктор: в массиве М i-ый столбец содержит хi, yi, Roi соответственно.
-				F(к,х) - значение к-й функции в точке х.
+	Описание:	Конструктор: в М i-ый столбец содержит хi, yi, Roi соответственно; F(к,х) - значение к-й функции в х.
 
 				Save: сохранение аппроксимации на произвольном интервале АВ.
 				getDelta: среднеквадратичное отклонение.
@@ -20,25 +19,22 @@
 #ifndef CAPPROX_H
 #define CAPPROX_H
 
-#include "Matrix.h"
 #include "Engine.h"
-
-typedef double (*Fk)(int, double);
 
 class CApprox
 {
 public:
-	CApprox(CMatrix &m, Fk F);
-	~CApprox();
+	CApprox(CMatrix &m, double (*Fk)(int, double));
+	~CApprox() {};
 	
-	void Approximate(int _n);
+	void Approximate(int n=1);
 	double getF(double x);
 	double getDelta();
 	void Save(CInterval &AB, char *fname);
 	
 private:
-	CMatrix M, *Ak;
-	Fk getFk;
+	CMatrix M,Ak;
+	double (*getFk)(int, double);
 	int n;
 };
 

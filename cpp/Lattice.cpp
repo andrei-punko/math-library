@@ -7,9 +7,8 @@
 ------------------------------------------------------------------------------------------------
 */
 
-#include <math.h>
 #include <assert.h>
-#include <iostream.h>	//Удалить!!!
+#include <math.h>
 
 #include "Engine.h"
 #include "Random.h"
@@ -68,14 +67,6 @@ void CLattice::InitVCC()
 		}
 	}
 
-	SetTemperature();
-}
-
-void CLattice::InitFCC()
-{
-	//Не дописано; заглушка
-
-	XYZ.SetSize(N=1,3);
 	SetTemperature();
 }
 
@@ -178,7 +169,7 @@ double CLattice::CalcForces(CMatrix &F)
 {
 	assert(F.GetM()==N && F.GetN()==3);
 
-	F.Clear();						//F(i,k) - k-я компонента силы, действующей на i-ю частицу со стороны остальных
+	F = 0;						//F(i,k) - k-я компонента силы, действующей на i-ю частицу со стороны остальных
 	lastU = 0;						//Потенциальная энергия системы
 
 	for(int i=0; i<N-1; i++)		//Выбираем i-ю частицу

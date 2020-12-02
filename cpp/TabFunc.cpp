@@ -2,8 +2,8 @@
 /*
 ------------------------------------------------------------------------------------------------
 	Файл:		TabFunc.cpp
-	Версия:		1.02
-	DLM:		13.08.2004
+	Версия:		1.03
+	DLM:		17.08.2005
 ------------------------------------------------------------------------------------------------
 */
 
@@ -24,75 +24,66 @@ CTabFunc::CTabFunc(CMatrix &m)
 void CTabFunc::CalcFactors()
 {
 	N = M.GetN();
-	double h1, h2,
-	*A = new double[N],	*B = new double[N],
-	*C = new double[N],	*F = new double[N],
-	*L = new double[N];
 	
-	a = new double[N];	b = new double[N];
-	c = new double[N+1]; d = new double[N];
+	double h1,h2;
+	CMatrix A(N),B(N),C(N),F(N),L(N);
 	
-	assert(A && B && C && F && L&& a && b && c && d);
-	N--;
+	a.SetSize(N); b.SetSize(N); c.SetSize(N+1); d.SetSize(N);
+	N--;	//!?
 	
 	for(int i=1; i<N; i++)
 	{
-		h1 = A[i] = M.x(i) - M.x(i-1);
-		h2 = B[i] = M.x(i+1) - M.x(i);
+		h1 = A(i) = M.x(i) - M.x(i-1);
+		h2 = B(i) = M.x(i+1) - M.x(i);
 
-		C[i] = -2.0*(h1 + h2);
-		F[i] = 3.0*( (M.y(i)-M.y(i-1))/h1 - (M.y(i+1)-M.y(i))/h2 );
+		C(i) = -2*(h1 + h2);
+		F(i) = 3*((M.y(i) - M.y(i-1))/h1 - (M.y(i+1) - M.y(i))/h2);
 	}
 	Progonka(N, A, B, C, F, 0, 0, 0, 0, L);		//Методом прогонки решаем систему
-	for(i=0; i<=N; i++) c[i+1] = L[i];
-		
-	delete []A; delete []B; delete []C; delete []F;	delete []L;
+	for(i=0; i<=N; i++) c(i+1) = L(i);
 
 	for(i=1; i<=N; i++)
 	{
-		a[i] = M.y(i-1);
+		a(i) = M.y(i-1);
 		h1 = M.x(i) - M.x(i-1);
-		b[i] = (M.y(i) - M.y(i-1))/h1 - h1/3.0*(c[i+1] + 2.0*c[i]);
-		d[i] = (c[i+1] - c[i])/(3.0*h1);
+		b(i) = (M.y(i) - M.y(i-1))/h1 - h1/3*(c(i+1) + 2*c(i));
+		d(i) = (c(i+1) - c(i))/(3*h1);
 	}
-}
-
-CTabFunc::~CTabFunc()
-{
-	delete []a;	delete []b;
-	delete []c;	delete []d;
 }
 
 double CTabFunc::D1(double x)
 {
-	if((x<=M.x(0)) || (M.x(N)<=x)) return 0;
-	
-	for(int i=1; M.x(i)<x; i++);	//Поиск интервала [x_i-1; x_i], содержащего х
+	if(x<=M.x(0) || M.x(N)<=x) return 0;
+	for(int i=1; M.x(i)<x; i++);		//Поиск интервала [x_i-1; x_i], содержащего х
 
-	double
-		h1 = x-M.x(i-1),
-		h2 = b[i] + h1*(2.0*c[i] + h1*3.0*d[i]);
+	double	h1 = x - M.x(i-1),
+			h2 = b(i) + h1*(2*c(i) + h1*3*d(i));
 
 	return h2;
 }
 
 double CTabFunc::D2(double x)
 {
-	if((x<=M.x(0)) || (M.x(N)<=x)) return 0;
-	
-	for(int i=1; M.x(i)<x; i++);	//Поиск интервала [x_i-1; x_i], содержащего х
+	if(x<=M.x(0) || M.x(N)<=x) return 0;
+	for(int i=1; M.x(i)<x; i++);		//Поиск интервала [x_i-1; x_i], содержащего х
 
-	return 2.0*c[i] + 6.0*d[i]*(x-M.x(i-1));
+	return 2*c(i) + 6*d(i)*(x - M.x(i-1));
 }
 
-double CTabFunc::Integrate()
+double CTabFunc::D3(double x)
 {
-	if(N%2 != 0) Conversion(N+1);
-	double
-		I = 0,
-		h1, h2;
+	if(x<=M.x(0) || M.x(N)<=x) return 0;
+	for(int i=1; M.x(i)<x; i++);		//Поиск интервала [x_i-1; x_i], содержащего х
 
-	for(int i=1; i<=N-1; i+=2)
+	return 6*d(i);
+}
+
+double CTabFunc::Simpson()
+{
+	if(!(N%2)) Conversion(N+1);		//Интегрируем по Симпсону; интервал должен состоять из четного числа частей
+	double h1,h2, I = 0;
+
+	for(int i=1; i<N; i+=2)
 	{
 		h1 = 0.5*( M.x(i) - M.x(i-1) );
 		h2 = 0.5*( M.x(i+1) - M.x(i) );
@@ -100,40 +91,43 @@ double CTabFunc::Integrate()
 		I += M.y(i-1)*(3*h1-h2) + 4*M.y(i)*(h1+h2) + M.y(i+1)*(3*h2-h1);
 	}
 
-	return I/3.0;
+	return I/3.;
 }
 
-double CTabFunc::Interpolate(double x)
-{									//Предполагается, что пары (X;Y) упорядочены по x
-	if(x<=M.x(0)) return M.y(0);
-	if(M.x(N)<=x) return M.y(N);
+double CTabFunc::F(double x)
+{
+	if(x <= M.x(0)) return M.y(0);		//Предполагается, что пары (X;Y) упорядочены по x
+	if(M.x(N) <= x) return M.y(N);
 	
-	for(int i=1; M.x(i)<x; i++);	//Поиск интервала [x_i-1; x_i], содержащего х
+	for(int i=1; M.x(i)<x; i++);		//Поиск интервала [x_i-1; x_i], содержащего х
 
-	double
-		h1 = x-M.x(i-1),
-		h2 = a[i] + h1*(b[i] + h1*(c[i] + h1*d[i]));
+	double	h1 = x - M.x(i-1),
+			h2 = a(i) + h1*(b(i) + h1*(c(i) + h1*d(i)));
 
 	return h2;
 }
 
-void CTabFunc::Tabulate(char *fname)
+void CTabFunc::SaveFunc(char *fname)
 {
-	ofstream f(fname);
-	for(int i=0; i<=N; i++) f<< M.x(i) <<" "<< M.y(i) <<"\n";
-	f.close();
+	M.Save(fname, false);
+}
+
+void CTabFunc::SaveFunc(CMatrix &m)
+{
+	m = M;
 }
 
 void CTabFunc::Conversion(int size)
 {
-	assert(size>0);
+	assert(size>=2);
+	
 	CMatrix nM(2, size);
 	CInterval AB(M.x(0), M.x(N), size);
 	
-	for(int i=0; i<size; i++)
+	for(int i=0; i<=size; i++)
 	{
 		nM.x(i) = AB.X(i);
-		nM.y(i) = Interpolate(AB.X(i));
+		nM.y(i) = F(AB.X(i));
 	}
 
 	M = nM; CalcFactors();

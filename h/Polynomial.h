@@ -15,18 +15,23 @@
 #define POLYNOMIAL_H
 
 //многочлен Лежандра
+//
 double polLejandr(int n, double x);
 
 //многочлен Лагерра
+//
 double polLagerr(int n, double x);
 
 //многочлен Эрмита
+//
 double polErmit(int n, double x);
 
 //многочлен Чебышева 1 рода
+//
 double polChebishev_1(int n, double x);
 
 //многочлен Чебышева 2 рода
+//
 double polChebishev_2(int n, double x);
 
 #endif

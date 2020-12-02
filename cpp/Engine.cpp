@@ -2,8 +2,8 @@
 /*
 ----------------------------------------------------------------------------------------
 	Файл:		Engine.cpp
-	Версия:		1.13
-	DLM:		12.08.2005
+	Версия:		1.14
+	DLM:		17.08.2005
 ----------------------------------------------------------------------------------------
 */
 
@@ -17,29 +17,19 @@
 
 #define L(x1,x2)	(fabs(x1-x2))
 
-void Progonka(int N,
-			  double *A, double *B, double *C, double *F,
-			  double m1, double n1, double m2, double n2,
-			  double *Y)
+void Progonka(int N, CMatrix &A,CMatrix &B,CMatrix &C,CMatrix &F, double m1,double n1,double m2,double n2, CMatrix &Y)
 {
-	double
-		*Alpha = new double[N+1],
-		*Beta = new double[N+1];
-	assert(Alpha && Beta);
-	
-	Alpha[1] = m1; Beta[1] = n1;
+	CMatrix Alpha(N+1), Beta(N+1);
 
+	Alpha(1) = m1; Beta(1) = n1;
 	for(int i=1; i<N; i++)
 	{
-		Alpha[i+1] = B[i]/(C[i]-A[i]*Alpha[i]);
-		Beta[i+1] = (A[i]*Beta[i]+F[i])/(C[i]-A[i]*Alpha[i]);
+		Alpha(i+1) = B(i)/(C(i) - A(i)*Alpha(i));
+		Beta(i+1) = (A(i)*Beta(i) + F(i))/(C(i) - A(i)*Alpha(i));
 	}
 
-	Y[N] = (n2+m2*Beta[N])/(1-m2*Alpha[N]);
-	for(i=N-1; i>=0; i--) Y[i] = Alpha[i+1]*Y[i+1]+Beta[i+1];
-
-	delete []Alpha;
-	delete []Beta;
+	Y(N) = (n2 + m2*Beta(N))/(1 - m2*Alpha(N));
+	for(i=N-1; i>=0; i--) Y(i) = Alpha(i+1)*Y(i+1) + Beta(i+1);
 }
 
 double Simpson(CInterval &AB, double (*getF)(double))
@@ -56,41 +46,6 @@ double Simpson(CInterval &AB, double (*getF)(double))
 		);
 
 	return I;
-}
-
-void CInterval::ReBorn(double X1, double X2, double H)
-{
-	assert(X1<X2 && H>0 && H<=X2-X1);
-	x1 = X1; x2 = X2; h = H; n = (int)floor( (x2-x1)/h );	//если необходимо, n будет на 1 больше
-}
-
-void CInterval::ReBorn(double X1, double X2, int N)
-{
-	assert(X1<X2 && N>0);
-	x1 = X1; x2 = X2; n = N; h = (x2-x1)/(double)n;
-}
-
-inline double CInterval::X(int i)
-{
-	assert(0<=i && i<=n);
-	return x1 + i*h;
-}
-
-CInterval::CInterval(CInterval &Interval)
-{
-	(*this) = Interval;
-}
-
-CInterval &CInterval::operator=(CInterval &right)
-{
-	if(&right != this)
-	{
-		x1 = right.x1;
-		x2 = right.x2;
-		h = right.h;
-		n = right.n;
-	}
-	return *this;
 }
 
 void mSOLVE(CMatrix &a, CMatrix &b, CMatrix &X)
@@ -140,13 +95,15 @@ void mSOLVE(CMatrix &a, CMatrix &b, CMatrix &X)
 
 void mINV(CMatrix &A, CMatrix &invA)
 {
+	assert(A.GetN() == A.GetM());
+
 	int Size = A.GetM();
-	assert(A.GetN() == Size && invA.GetM() == Size && invA.GetN() == Size);
+	invA.SetSize(Size,Size);
 
 	CMatrix	E(Size),T(Size);
 	for(int i=0; i<Size; i++)
 	{
-		E.Clear(); E(i) = 1;
+		E = 0; E(i) = 1;
 		mSOLVE(A,E,T);
 
 		for(int j=0; j<Size; j++) invA(j,i) = T(j);
@@ -185,12 +142,6 @@ double mDET(CMatrix &A)
 	return DET;
 }
 
-inline int CInterval::i(double x)
-{
-	assert(x1<=x && x<=x2);
-	return (int)( (x-x1)/h );
-}
-
 double FindMinMax(CInterval &AB, double(*f)(double), int find_max)
 {
 	double x[4];
@@ -227,21 +178,21 @@ double FindMinMax(CInterval &AB, double(*f)(double), int find_max)
 	return 0.5*(x[2]+x[0]);
 }
 
-void Save(CInterval &AB, double (*func)(int), char *fname)
+void SaveFunc(CInterval &AB, double (*func)(int), char *fname)
 {
 	ofstream f(fname);
 	for(int i=0; i<=AB.N(); i++) f<< AB.X(i) <<" "<< func(i) <<"\n";
 	f.close();
 }
 
-void Save(CInterval &AB, double (*func)(double), char *fname)
+void SaveFunc(CInterval &AB, double (*func)(double), char *fname)
 {
 	ofstream f(fname);
 	for(int i=0; i<=AB.N(); i++) f<< AB.X(i) <<" "<< func(AB.X(i)) <<"\n";
 	f.close();
 }
 
-void Save(CInterval &t, double(*x)(double), double (*func)(double), char *fname)
+void SaveFunc(CInterval &t, double(*x)(double), double (*func)(double), char *fname)
 {
 	ofstream f(fname);
 	for(int i=0; i<=t.N(); i++) f<< x( t.X(i) )<<" "<< func( t.X(i) ) <<"\n";
@@ -254,8 +205,8 @@ void SaveCorrelationFunc(CMatrix &A, char *fname, double precision)
 	
 	double Min = A.Min(), Max = A.Max();
 	CInterval AB(Min, Max, (Max-Min)*precision);
-	CMatrix P(AB.N(),2);	//Частоты
-	P.Clear();
+	CMatrix P(AB.N(),2);			//Частоты
+	P = 0;
 	
 	for(int i=0; i<A.GetM(); i++)
 	{
@@ -293,14 +244,23 @@ CMatrix::CMatrix(int m, int n)
 	assert(pData);
 }
 
-void CMatrix::Save(char *fname)
+void CMatrix::Save(char *fname, bool orig_view)
 {
 	ofstream f(fname);
-	for(int i=0; i<M; i++)
-	{
-		for(int j=0; j<N; j++)	f<< (*this)(i,j) <<" ";
-		f << "\n";
-	}
+
+	if(orig_view)
+		for(int i=0; i<M; i++)
+		{
+			for(int j=0; j<N; j++)	f<< (*this)(i,j) <<" ";
+			f<<"\n";
+		}
+	else
+		for(int j=0; j<N; j++)
+		{
+			for(int i=0; i<M; i++)	f<< (*this)(i,j) <<" ";
+			f<<"\n";
+		}
+
 	f.close();
 }
 
@@ -366,12 +326,6 @@ bool CMatrix::operator==(CMatrix &right)
 	for(int j=0; j<N; j++) if(*(pData + i*N + j) != *(right.pData + i*N + j)) return false;
 	
 	return true;
-}
-
-void CMatrix::Clear()
-{
-	for(int i=0; i<M; i++)
-	for(int j=0; j<N; j++) (*this)(i,j) = 0;
 }
 
 double Round(double d)
