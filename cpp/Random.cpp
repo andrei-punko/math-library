@@ -14,7 +14,7 @@
 #include <time.h>
 #include <assert.h>
 
-#include "Random.h"
+#include "../h/Random.h"
 
 #define IA 16807
 #define IM 2147483647

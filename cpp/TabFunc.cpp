@@ -8,10 +8,10 @@
 */
 
 #include <assert.h>
-#include <fstream.h>
+#include <fstream>
 
-#include "TabFunc.h"
-#include "Engine.h"
+#include "../h/TabFunc.h"
+#include "../h/Engine.h"
 
 CTabFunc::CTabFunc(CMatrix &m)
 {
@@ -40,9 +40,9 @@ void CTabFunc::CalcFactors()
 		F(i) = 3*((M.y(i) - M.y(i-1))/h1 - (M.y(i+1) - M.y(i))/h2);
 	}
 	Progonka(N, A, B, C, F, 0, 0, 0, 0, L);		//Методом прогонки решаем систему
-	for(i=0; i<=N; i++) c(i+1) = L(i);
+	for(int i=0; i<=N; i++) c(i+1) = L(i);
 
-	for(i=1; i<=N; i++)
+	for(int i=1; i<=N; i++)
 	{
 		a(i) = M.y(i-1);
 		h1 = M.x(i) - M.x(i-1);
@@ -54,10 +54,11 @@ void CTabFunc::CalcFactors()
 double CTabFunc::D1(double x)
 {
 	if(x<=M.x(0) || M.x(N)<=x) return 0;
-	for(int i=1; M.x(i)<x; i++);		//Поиск интервала [x_i-1; x_i], содержащего х
+	int index = 1;
+	for(int i=1; M.x(i)<x; i++) index=i;		//Поиск интервала [x_i-1; x_i], содержащего х
 
-	double	h1 = x - M.x(i-1),
-			h2 = b(i) + h1*(2*c(i) + h1*3*d(i));
+	double	h1 = x - M.x(index-1),
+			h2 = b(index) + h1*(2*c(index) + h1*3*d(index));
 
 	return h2;
 }
@@ -65,17 +66,19 @@ double CTabFunc::D1(double x)
 double CTabFunc::D2(double x)
 {
 	if(x<=M.x(0) || M.x(N)<=x) return 0;
-	for(int i=1; M.x(i)<x; i++);		//Поиск интервала [x_i-1; x_i], содержащего х
+	int index = 1;
+	for(int i=1; M.x(i)<x; i++) index=i;		//Поиск интервала [x_i-1; x_i], содержащего х
 
-	return 2*c(i) + 6*d(i)*(x - M.x(i-1));
+	return 2*c(index) + 6*d(index)*(x - M.x(index-1));
 }
 
 double CTabFunc::D3(double x)
 {
 	if(x<=M.x(0) || M.x(N)<=x) return 0;
-	for(int i=1; M.x(i)<x; i++);		//Поиск интервала [x_i-1; x_i], содержащего х
+	int index = 1;
+	for(int i=1; M.x(i)<x; i++) index=i;		//Поиск интервала [x_i-1; x_i], содержащего х
 
-	return 6*d(i);
+	return 6*d(index);
 }
 
 double CTabFunc::Simpson()
@@ -99,10 +102,11 @@ double CTabFunc::F(double x)
 	if(x <= M.x(0)) return M.y(0);		//Предполагается, что пары (X;Y) упорядочены по x
 	if(M.x(N) <= x) return M.y(N);
 	
-	for(int i=1; M.x(i)<x; i++);		//Поиск интервала [x_i-1; x_i], содержащего х
+	int index = 1;
+	for(int i=1; M.x(i)<x; i++) index = i;		//Поиск интервала [x_i-1; x_i], содержащего х
 
-	double	h1 = x - M.x(i-1),
-			h2 = a(i) + h1*(b(i) + h1*(c(i) + h1*d(i)));
+	double	h1 = x - M.x(index-1),
+			h2 = a(index) + h1*(b(index) + h1*(c(index) + h1*d(index)));
 
 	return h2;
 }

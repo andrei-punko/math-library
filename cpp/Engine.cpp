@@ -8,14 +8,17 @@
 */
 
 #include <assert.h>
-#include <fstream.h>
+#include <iostream>
+#include <fstream>
 #include <math.h>
 #include <process.h>	//exit()
 
-#include "Engine.h"
-#include "Constants.h"
+#include "../h/Constants.h"
+#include "../h/Engine.h"
 
 #define L(x1,x2)	(fabs(x1-x2))
+
+using namespace std;
 
 void Progonka(int N, CMatrix &A,CMatrix &B,CMatrix &C,CMatrix &F, double m1,double n1,double m2,double n2, CMatrix &Y)
 {
@@ -29,7 +32,7 @@ void Progonka(int N, CMatrix &A,CMatrix &B,CMatrix &C,CMatrix &F, double m1,doub
 	}
 
 	Y(N) = (n2 + m2*Beta(N))/(1 - m2*Alpha(N));
-	for(i=N-1; i>=0; i--) Y(i) = Alpha(i+1)*Y(i+1) + Beta(i+1);
+	for(int i=N-1; i>=0; i--) Y(i) = Alpha(i+1)*Y(i+1) + Beta(i+1);
 }
 
 double Simpson(CInterval &AB, double (*getF)(double))
@@ -40,7 +43,7 @@ double Simpson(CInterval &AB, double (*getF)(double))
 
 	for(int i=1; i<AB.N(); i+=2) I += getF(AB.X(i));
 	I *= 2;
-	for(i=2; i<=AB.N()-2; i+=2) I += getF(AB.X(i));
+	for(int i=2; i<=AB.N()-2; i+=2) I += getF(AB.X(i));
 	I = AB.H()/3.*(
 		getF(AB.X1()) + I*2 + getF(AB.X2())
 		);
@@ -72,13 +75,13 @@ void mSOLVE(CMatrix &a, CMatrix &b, CMatrix &X)
 
 		//Деление на коэффициент при первом члене
 		B(Curr) = B(Curr)/A(Curr,Curr);
-		for(i=Size-1; i>=Curr; i--)	A(Curr,i) = A(Curr,i)/A(Curr,Curr);			
+		for(int i=Size-1; i>=Curr; i--)	A(Curr,i) = A(Curr,i)/A(Curr,Curr);
 
 		//Вычитание строк
 		for(int line=Curr+1; line<Size; line++)
 		{
 			B(line) = B(line) - B(Curr)*A(line,Curr);
-			for(i=Size-1; i>=Curr; i--)
+			for(int i=Size-1; i>=Curr; i--)
 				A(line,i) = A(line,i) - A(Curr,i)*A(line,Curr);
 		}
 	}
@@ -133,7 +136,7 @@ double mDET(CMatrix &A)
 
 		//Вычитание строк
 		for(int line=Curr+1; line<Size; line++)
-		for(i=Size-1; i>=Curr; i--)	A(line,i) = A(line,i) - A(Curr,i)/A(Curr,Curr)*A(line,Curr);
+		for(int i=Size-1; i>=Curr; i--)	A(line,i) = A(line,i) - A(Curr,i)/A(Curr,Curr)*A(line,Curr);
 	}
 
 	double DET = (NSw % 2) ? -1:1;
@@ -157,7 +160,7 @@ double FindMinMax(CInterval &AB, double(*f)(double), int find_max)
 		for(int i=1; i<4; i++) if(find_max*(f(x[i])-f(x[m_i])) > 0) m_i = i;
 
 		//поиск наиболее удаленной от минимума точки
-		for(i=1; i<4; i++) if(L(x[m_i],x[i]) > L(x[m_i],x[f_i])) f_i = i;
+		for(int i=1; i<4; i++) if(L(x[m_i],x[i]) > L(x[m_i],x[f_i])) f_i = i;
 
 		//перенумеровываем точки, чтобы наиболее удаленная стала 4-й
 		if(f_i!=3) x[f_i] = x[3];
@@ -168,7 +171,7 @@ double FindMinMax(CInterval &AB, double(*f)(double), int find_max)
 		for(m_i=0; m_i<=1; m_i++)
 		{
 			int min = m_i;
-			for(i=1; i<=2; i++) if(x[i]<x[m_i]) min = i;
+			for(int i=1; i<=2; i++) if(x[i]<x[m_i]) min = i;
 
 			d = x[min];
 			x[min] = x[m_i];
@@ -223,8 +226,8 @@ void SaveCorrelationFunc(CMatrix &A, char *fname, double precision)
 	//Нормировка
 	//
 	double max = P(0,1);
-	for(i=1; i<P.GetM(); i++) if(P(i,1) > max) max = P(i,1);
-	for(i=0; i<P.GetM(); i++) P(i,1) /= max;
+	for(int i=1; i<P.GetM(); i++) if(P(i,1) > max) max = P(i,1);
+	for(int i=0; i<P.GetM(); i++) P(i,1) /= max;
 	
 	P.Save(fname);
 }

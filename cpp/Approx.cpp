@@ -8,11 +8,13 @@
 */
 
 #include <assert.h>
-#include <fstream.h>
+#include <fstream>
 #include <math.h>
 
-#include "Approx.h"
-#include "Engine.h"
+#include "../h/Approx.h"
+#include "../h/Engine.h"
+
+using namespace std;
 
 CApprox::CApprox(CMatrix &m, double (*Fk)(int, double))
 {

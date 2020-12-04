@@ -10,7 +10,7 @@
 #include <assert.h>
 #include <math.h>
 
-#include "Engine.h"
+#include "../h/Engine.h"
 
 CInterval::CInterval(double X1, double X2, double H)
 {

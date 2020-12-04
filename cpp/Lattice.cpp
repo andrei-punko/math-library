@@ -10,9 +10,9 @@
 #include <assert.h>
 #include <math.h>
 
-#include "Engine.h"
-#include "Random.h"
-#include "Constants.h"
+#include "../h/Engine.h"
+#include "../h/Random.h"
+#include "../h/Constants.h"
 
 void CLattice::InitManual(CMatrix &XYZ)
 {
@@ -190,7 +190,7 @@ double CLattice::CalcForces(CMatrix &F)
 		{
 			lastU += V(R);			//Вклад в потенциальную энергию от пары частиц i-j
 
-			for(k=0; k<3; k++)
+			for(int k=0; k<3; k++)
 			{
 				double df = d[k]/R*dV_dr(R);	//Вклад в F(i,k) со стороны j-й частицы
 				F(i,k) -= df;

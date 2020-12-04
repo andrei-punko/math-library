@@ -8,12 +8,14 @@
 */
 
 #include <assert.h>
-#include <fstream.h>
+#include <fstream>
 #include <math.h>
 
-#include "Engine.h"
-#include "Equation.h"
-#include "TabFunc.h"
+#include "../h/Engine.h"
+#include "../h/Equation.h"
+#include "../h/TabFunc.h"
+
+using namespace std;
 
 void SolveODE(CInterval AB, double U0, double (*fn)(double, double), char *fname)
 {
@@ -53,7 +55,7 @@ void CEqn::sUt(char *fname, double t[], int size)
 	for(int i=0; i<size; i++) assert(D.t.X1()<=t[i] && t[i]<=D.t.X2());
 
 	ofstream f(fname);
-	for(i=0; i<=D.x.N(); i++)
+	for(int i=0; i<=D.x.N(); i++)
 	{
 		f<< D.x.X(i);
 		for(int j=0; j<size; j++) f<<" "<< Arr(D.t.i(t[j]),i);
@@ -67,7 +69,7 @@ void CEqn::sUx(char *fname, double x[], int size)
 	for(int i=0; i<size; i++) assert(D.x.X1()<=x[i] && x[i]<=D.x.X2());
 
 	ofstream f(fname);
-	for(i=0; i<=D.t.N(); i++)
+	for(int i=0; i<=D.t.N(); i++)
 	{
 		f<< D.t.X(i);
 		for(int j=0; j<size; j++) f<<" "<< Arr(i,D.x.i(x[j]));
@@ -172,7 +174,7 @@ void CParEqn::Solve(double h, double tau)
 		}
 
 		Progonka(N, A,B,C,F, Mu[1],Nu[1], Mu[2],Nu[2], U);
-		for(i=0; i<=N; i++) Arr(nj,i) = U(i);
+		for(int i=0; i<=N; i++) Arr(nj,i) = U(i);
 	}
 }
 
@@ -211,7 +213,7 @@ void CHypEqn::Solve(double h, double tau)
 	//
 	for(int j=0; j<=D.t.N()-2; j++)
 	{
-		for(i=1; i<N; i++)
+		for(int i=1; i<N; i++)
 		{
 			double
 				_u = Arr(j,i-1),
@@ -251,6 +253,6 @@ void CHypEqn::Solve(double h, double tau)
 		}
 
 		Progonka(N, A,B,C,F, Mu[1],Nu[1], Mu[2],Nu[2], U);
-		for(i=0; i<=N; i++) Arr(nj,i) = U(i);
+		for(int i=0; i<=N; i++) Arr(nj,i) = U(i);
 	}
 }
