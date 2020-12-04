@@ -1,4 +1,3 @@
-
 # Math library
 
 Developed during 2003-2005 by Andrei Punko (andd3dfx)

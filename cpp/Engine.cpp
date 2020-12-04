@@ -1,8 +1,8 @@
 
 /*
 ----------------------------------------------------------------------------------------
-	Файл:		Engine.cpp
-	Версия:		1.14
+	Р¤Р°Р№Р»:		Engine.cpp
+	Р’РµСЂСЃРёСЏ:		1.14
 	DLM:		17.08.2005
 ----------------------------------------------------------------------------------------
 */
@@ -34,7 +34,7 @@ void Progonka(int N, CMatrix &A,CMatrix &B,CMatrix &C,CMatrix &F, double m1,doub
 
 double Simpson(CInterval &AB, double (*getF)(double))
 {
-	if(AB.N() % 2) AB.ReBorn(AB.X1(), AB.X2(), AB.N()+1);	//N должно быть четным
+	if(AB.N() % 2) AB.ReBorn(AB.X1(), AB.X2(), AB.N()+1);	//N РґРѕР»Р¶РЅРѕ Р±С‹С‚СЊ С‡РµС‚РЅС‹Рј
 
 	double I = 0;
 
@@ -53,28 +53,28 @@ void mSOLVE(CMatrix &a, CMatrix &b, CMatrix &X)
 	int Size = a.GetM();
 	assert(a.GetN() == Size && b.GetM() == Size);
 
-	CMatrix	A(a), B(b);		//Создаем копии матриц, т.к. над ними проводим действия
+	CMatrix	A(a), B(b);		//РЎРѕР·РґР°РµРј РєРѕРїРёРё РјР°С‚СЂРёС†, С‚.Рє. РЅР°Рґ РЅРёРјРё РїСЂРѕРІРѕРґРёРј РґРµР№СЃС‚РІРёСЏ
 
-	//Приведение матрицы к треугольному виду
+	//РџСЂРёРІРµРґРµРЅРёРµ РјР°С‚СЂРёС†С‹ Рє С‚СЂРµСѓРіРѕР»СЊРЅРѕРјСѓ РІРёРґСѓ
 	for(int Curr=0; Curr<Size; Curr++)
 	{
 		int MaxNm = Curr;
 
-		//Поиск максимального элемента в столбце Curr
+		//РџРѕРёСЃРє РјР°РєСЃРёРјР°Р»СЊРЅРѕРіРѕ СЌР»РµРјРµРЅС‚Р° РІ СЃС‚РѕР»Р±С†Рµ Curr
 		for(int i=Curr+1; i<Size; i++)
 			if(A(i,Curr)>A(i,MaxNm)) MaxNm = i;
 
-		//Перестановка строк
+		//РџРµСЂРµСЃС‚Р°РЅРѕРІРєР° СЃС‚СЂРѕРє
 		if(MaxNm!=Curr)
 		{
 			A.SwapLines(Curr,MaxNm); B.SwapLines(Curr,MaxNm);
 		}
 
-		//Деление на коэффициент при первом члене
+		//Р”РµР»РµРЅРёРµ РЅР° РєРѕСЌС„С„РёС†РёРµРЅС‚ РїСЂРё РїРµСЂРІРѕРј С‡Р»РµРЅРµ
 		B(Curr) = B(Curr)/A(Curr,Curr);
 		for(i=Size-1; i>=Curr; i--)	A(Curr,i) = A(Curr,i)/A(Curr,Curr);			
 
-		//Вычитание строк
+		//Р’С‹С‡РёС‚Р°РЅРёРµ СЃС‚СЂРѕРє
 		for(int line=Curr+1; line<Size; line++)
 		{
 			B(line) = B(line) - B(Curr)*A(line,Curr);
@@ -83,7 +83,7 @@ void mSOLVE(CMatrix &a, CMatrix &b, CMatrix &X)
 		}
 	}
 
-	//Нахождение решения системы по треугольной матрице
+	//РќР°С…РѕР¶РґРµРЅРёРµ СЂРµС€РµРЅРёСЏ СЃРёСЃС‚РµРјС‹ РїРѕ С‚СЂРµСѓРіРѕР»СЊРЅРѕР№ РјР°С‚СЂРёС†Рµ
 	double d;
 	for(int i=Size-1; i>=0; i--)
 	{
@@ -115,23 +115,23 @@ double mDET(CMatrix &A)
 	int Size = A.GetM();
 	assert(A.GetN() == Size);
 
-	int NSw = 0; //Количество перестановок строк
+	int NSw = 0; //РљРѕР»РёС‡РµСЃС‚РІРѕ РїРµСЂРµСЃС‚Р°РЅРѕРІРѕРє СЃС‚СЂРѕРє
 
-	//Приведение матрицы к треугольному виду
+	//РџСЂРёРІРµРґРµРЅРёРµ РјР°С‚СЂРёС†С‹ Рє С‚СЂРµСѓРіРѕР»СЊРЅРѕРјСѓ РІРёРґСѓ
 	for(int Curr=0; Curr<Size; Curr++)
 	{
 		int MaxNm = Curr;
 
-		//Поиск максимального элемента в столбце Curr
+		//РџРѕРёСЃРє РјР°РєСЃРёРјР°Р»СЊРЅРѕРіРѕ СЌР»РµРјРµРЅС‚Р° РІ СЃС‚РѕР»Р±С†Рµ Curr
 		for(int i=Curr+1; i<Size; i++) if(A(i,Curr)>A(i,MaxNm)) MaxNm = i;
 
-		//Перестановка строк
+		//РџРµСЂРµСЃС‚Р°РЅРѕРІРєР° СЃС‚СЂРѕРє
 		if(MaxNm!=Curr)	{ A.SwapLines(Curr,MaxNm); NSw++; }
 
-		//Деление на коэффициент при первом члене
+		//Р”РµР»РµРЅРёРµ РЅР° РєРѕСЌС„С„РёС†РёРµРЅС‚ РїСЂРё РїРµСЂРІРѕРј С‡Р»РµРЅРµ
 //		for(i=Size-1; i>=Curr; i--)	A(Curr,i) = A(Curr,i)/A(Curr,Curr);			
 
-		//Вычитание строк
+		//Р’С‹С‡РёС‚Р°РЅРёРµ СЃС‚СЂРѕРє
 		for(int line=Curr+1; line<Size; line++)
 		for(i=Size-1; i>=Curr; i--)	A(line,i) = A(line,i) - A(Curr,i)/A(Curr,Curr)*A(line,Curr);
 	}
@@ -153,16 +153,16 @@ double FindMinMax(CInterval &AB, double(*f)(double), int find_max)
 		x[3] = x[0]+x[2]-x[1];	
 		int	m_i = 0, f_i = 0;
 	
-		//поиск минимальной из 4 точек
+		//РїРѕРёСЃРє РјРёРЅРёРјР°Р»СЊРЅРѕР№ РёР· 4 С‚РѕС‡РµРє
 		for(int i=1; i<4; i++) if(find_max*(f(x[i])-f(x[m_i])) > 0) m_i = i;
 
-		//поиск наиболее удаленной от минимума точки
+		//РїРѕРёСЃРє РЅР°РёР±РѕР»РµРµ СѓРґР°Р»РµРЅРЅРѕР№ РѕС‚ РјРёРЅРёРјСѓРјР° С‚РѕС‡РєРё
 		for(i=1; i<4; i++) if(L(x[m_i],x[i]) > L(x[m_i],x[f_i])) f_i = i;
 
-		//перенумеровываем точки, чтобы наиболее удаленная стала 4-й
+		//РїРµСЂРµРЅСѓРјРµСЂРѕРІС‹РІР°РµРј С‚РѕС‡РєРё, С‡С‚РѕР±С‹ РЅР°РёР±РѕР»РµРµ СѓРґР°Р»РµРЅРЅР°СЏ СЃС‚Р°Р»Р° 4-Р№
 		if(f_i!=3) x[f_i] = x[3];
 
-		//упорядочение
+		//СѓРїРѕСЂСЏРґРѕС‡РµРЅРёРµ
 		double d;
 
 		for(m_i=0; m_i<=1; m_i++)
@@ -205,7 +205,7 @@ void SaveCorrelationFunc(CMatrix &A, char *fname, double precision)
 	
 	double Min = A.Min(), Max = A.Max();
 	CInterval AB(Min, Max, (Max-Min)*precision);
-	CMatrix P(AB.N(),2);			//Частоты
+	CMatrix P(AB.N(),2);			//Р§Р°СЃС‚РѕС‚С‹
 	P = 0;
 	
 	for(int i=0; i<A.GetM(); i++)
@@ -213,14 +213,14 @@ void SaveCorrelationFunc(CMatrix &A, char *fname, double precision)
 		double f_i = A(i);
 		int num_of_f_i = AB.i(f_i);
 		
-		if(num_of_f_i != AB.N())	//CInterval включает обе границы диапазона 0..N; CMatrix - только 0
+		if(num_of_f_i != AB.N())	//CInterval РІРєР»СЋС‡Р°РµС‚ РѕР±Рµ РіСЂР°РЅРёС†С‹ РґРёР°РїР°Р·РѕРЅР° 0..N; CMatrix - С‚РѕР»СЊРєРѕ 0
 		{
 			P(num_of_f_i,0) = A(i);
 			P(num_of_f_i,1) += 1;
 		}
 	}
 	
-	//Нормировка
+	//РќРѕСЂРјРёСЂРѕРІРєР°
 	//
 	double max = P(0,1);
 	for(i=1; i<P.GetM(); i++) if(P(i,1) > max) max = P(i,1);
@@ -330,7 +330,7 @@ bool CMatrix::operator==(CMatrix &right)
 
 double Round(double d)
 {
-	double r = ceil(d);		//Использование (int) недопустимо!
+	double r = ceil(d);		//РСЃРїРѕР»СЊР·РѕРІР°РЅРёРµ (int) РЅРµРґРѕРїСѓСЃС‚РёРјРѕ!
 	if(fabs(d-r) > 0.5) return r += sign(d); else return r;
 }
 
@@ -339,7 +339,7 @@ CMatrix::~CMatrix()
 	if(!pData) delete [] pData;
 }
 
-void CMatrix::SetSize(int m, int n)		//!Память не освобождается, если L-массив УЖЕ имеет нужные размеры
+void CMatrix::SetSize(int m, int n)		//!РџР°РјСЏС‚СЊ РЅРµ РѕСЃРІРѕР±РѕР¶РґР°РµС‚СЃСЏ, РµСЃР»Рё L-РјР°СЃСЃРёРІ РЈР–Р• РёРјРµРµС‚ РЅСѓР¶РЅС‹Рµ СЂР°Р·РјРµСЂС‹
 {
 	assert(m>=1 && n>=0);
 
@@ -387,15 +387,15 @@ void MMD(CLattice &Lattice, double dt, int StepsCount, bool sEnergy, void (*func
 	
 	Lattice.CalcForces(F1);
 	
-	double E0 = Lattice.getE_k() + Lattice.getU();	//Потенциальная энергия известна только после вызова CalcForces()
+	double E0 = Lattice.getE_k() + Lattice.getU();	//РџРѕС‚РµРЅС†РёР°Р»СЊРЅР°СЏ СЌРЅРµСЂРіРёСЏ РёР·РІРµСЃС‚РЅР° С‚РѕР»СЊРєРѕ РїРѕСЃР»Рµ РІС‹Р·РѕРІР° CalcForces()
 
 	for(int step=0; step<StepsCount; step++)
 	{
 		for(k=0; k<3; k++)
 		for(i=0; i<N; i++) Lattice.XYZ(i,k) += dt*(Lattice.VXYZ(i,k) + t_2*F1(i,k));
 		
-		flag = CheckValue(Lattice.XYZ,Lattice.L);	//Вылетевшие частицы впускаем через противоположную стенку
-		if(!flag)									//Проверка, не пролетает ли частица за dt больше L
+		flag = CheckValue(Lattice.XYZ,Lattice.L);	//Р’С‹Р»РµС‚РµРІС€РёРµ С‡Р°СЃС‚РёС†С‹ РІРїСѓСЃРєР°РµРј С‡РµСЂРµР· РїСЂРѕС‚РёРІРѕРїРѕР»РѕР¶РЅСѓСЋ СЃС‚РµРЅРєСѓ
+		if(!flag)									//РџСЂРѕРІРµСЂРєР°, РЅРµ РїСЂРѕР»РµС‚Р°РµС‚ Р»Рё С‡Р°СЃС‚РёС†Р° Р·Р° dt Р±РѕР»СЊС€Рµ L
 		{
 			cout<< "\nstep = "<< step <<"\n! dt is large !\n" <<endl; exit(1);
 		}
