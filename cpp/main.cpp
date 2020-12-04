@@ -11,7 +11,7 @@
 */
 
 #include <assert.h>
-#include <iostream.h>
+#include <iostream>
 #include <math.h>
 
 #include "Constants.h"
