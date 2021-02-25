@@ -13,8 +13,8 @@
 #include <math.h>
 #include <process.h>	//exit()
 
-#include "../h/Constants.h"
-#include "../h/Engine.h"
+#include "Constants.h"
+#include "Engine.h"
 
 #define L(x1,x2)	(fabs(x1-x2))
 

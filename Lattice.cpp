@@ -10,9 +10,9 @@
 #include <assert.h>
 #include <math.h>
 
-#include "../h/Engine.h"
-#include "../h/Random.h"
-#include "../h/Constants.h"
+#include "Engine.h"
+#include "Random.h"
+#include "Constants.h"
 
 void CLattice::InitManual(CMatrix &XYZ)
 {

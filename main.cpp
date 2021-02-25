@@ -14,13 +14,13 @@
 #include <iostream>
 #include <math.h>
 
-#include "../h/Constants.h"
-#include "../h/Approx.h"
-#include "../h/Engine.h"
-#include "../h/Equation.h"
-#include "../h/Polynomial.h"
-#include "../h/Random.h"
-#include "../h/TabFunc.h"
+#include "Constants.h"
+#include "Approx.h"
+#include "Engine.h"
+#include "Equation.h"
+#include "Polynomial.h"
+#include "Random.h"
+#include "TabFunc.h"
 
 using namespace ScCs;
 

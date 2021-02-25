@@ -7,7 +7,7 @@
 -------------------------------------------------------------------------------------------
 */
 
-#include "../h/Polynomial.h"
+#include "Polynomial.h"
 
 double polLejandr(int n, double x)
 {

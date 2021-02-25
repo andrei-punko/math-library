@@ -11,8 +11,8 @@
 #include <fstream>
 #include <math.h>
 
-#include "../h/Approx.h"
-#include "../h/Engine.h"
+#include "Approx.h"
+#include "Engine.h"
 
 using namespace std;
 

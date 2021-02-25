@@ -10,8 +10,8 @@
 #include <assert.h>
 #include <fstream>
 
-#include "../h/TabFunc.h"
-#include "../h/Engine.h"
+#include "TabFunc.h"
+#include "Engine.h"
 
 CTabFunc::CTabFunc(CMatrix &m)
 {

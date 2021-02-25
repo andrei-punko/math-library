@@ -11,9 +11,9 @@
 #include <fstream>
 #include <math.h>
 
-#include "../h/Engine.h"
-#include "../h/Equation.h"
-#include "../h/TabFunc.h"
+#include "Engine.h"
+#include "Equation.h"
+#include "TabFunc.h"
 
 using namespace std;
 
