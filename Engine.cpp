@@ -11,7 +11,6 @@
 #include <iostream>
 #include <fstream>
 #include <math.h>
-#include <process.h>	//exit()
 
 #include "Constants.h"
 #include "Engine.h"
