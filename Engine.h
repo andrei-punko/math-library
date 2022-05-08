@@ -169,7 +169,7 @@ public:
 	double P_u_to_s(double d=1) { return m/(a*tau2)*d; };
 	
 private:
-	double a,m,tau,alpha,beta, a2,tau2;
+	double a,a2,m,tau,tau2,alpha,beta;
 };
 
 class CLattice
@@ -194,8 +194,8 @@ public:
 	
 	double getRecommendedTau(double gamma=0.6);
 
-	int N;
 	double L,L_2,(*V)(double),(*dV_dr)(double);
+	int N;
 	CMatrix XYZ,VXYZ;
 
 private:
