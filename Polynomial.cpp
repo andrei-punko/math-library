@@ -42,8 +42,8 @@ double polChebishev_1(int n, double x)
 		case 0: return 1.0; break;
 		case 1: return x; break;
 
-		default: double N = (double)(--n);
-			return 2.0*x*polChebishev_1(n,x) - polChebishev_1(n-1,x);
+		default: 
+			return 2.0*x*polChebishev_1(n-1,x) - polChebishev_1(n-2,x);
 	}
 }
 
@@ -54,7 +54,7 @@ double polChebishev_2(int n, double x)
 		case 0: return 1.0; break;
 		case 1: return 2.0*x; break;
 
-		default: double N = (double)(--n);
-			return 2.0*x*polChebishev_2(n,x) - polChebishev_2(n-1,x);
+		default: 
+			return 2.0*x*polChebishev_2(n-1,x) - polChebishev_2(n-2,x);
 	}
 }
