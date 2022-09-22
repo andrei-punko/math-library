@@ -7,7 +7,6 @@
 #include "Approx.h"
 #include "Engine.h"
 #include "Equation.h"
-#include "Polynomial.h"
 #include "Random.h"
 #include "TabFunc.h"
 

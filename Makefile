@@ -3,7 +3,7 @@
 CC=g++
 CFLAGS=-c -Wall
 LDFLAGS=
-SOURCES=main.cpp Approx.cpp Engine.cpp Equation.cpp Interval.cpp Lattice.cpp Polynomial.cpp Random.cpp TabFunc.cpp
+SOURCES=main.cpp Approx.cpp Engine.cpp Equation.cpp Interval.cpp Lattice.cpp Random.cpp TabFunc.cpp
 OBJECTS=$(SOURCES:.cpp=.o)
 EXECUTABLE=app
 
