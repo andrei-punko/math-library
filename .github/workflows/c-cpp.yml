@@ -5,7 +5,6 @@ on:
     branches: [ master ]
   pull_request:
     branches: [ master ]
-  
   # configure manual trigger
   workflow_dispatch:
 
@@ -14,6 +13,8 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v2
-    - name: make
-      run: make
+      - name: Check out code
+        uses: actions/checkout@v4
+
+      - name: Build using `make`
+        run: make
