@@ -1,9 +1,11 @@
 
-## Math library with implementation of some numerical methods
+# Math library with implementation of some numerical methods
 
-[![C/C++ CI](https://github.com/andrei-punko/math-library/actions/workflows/c-cpp.yml/badge.svg?branch=master)](https://github.com/andrei-punko/math-library/actions/workflows/c-cpp.yml)
+[![C/C++ CI](https://github.com/andrei-punko/math-library/actions/workflows/c-cpp.yml/badge.svg)](https://github.com/andrei-punko/math-library/actions/workflows/c-cpp.yml)
 
 Developed during 2003-2005 by [Andrei Punko](mailto:andd3dfx@gmail.com)
+
+# Содержание
 
 - Аппроксимация функции заданной таблично с заданным среднеквадратичым отклонением 
   при помощи произвольного набора функций.  
