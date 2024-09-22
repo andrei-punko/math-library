@@ -1,4 +1,4 @@
-# https://habr.com/ru/post/155201/
+# With help of article: https://habr.com/ru/post/155201/
 
 CC=g++
 CFLAGS=-c -Wall

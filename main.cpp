@@ -14,6 +14,5 @@ using namespace ScCs;
 
 int main()
 {
-
 	return 0;
 }
