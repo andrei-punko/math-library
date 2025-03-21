@@ -2,8 +2,7 @@
 
 [![C/C++ CI](https://github.com/andrei-punko/math-library/actions/workflows/c-cpp.yml/badge.svg)](https://github.com/andrei-punko/math-library/actions/workflows/c-cpp.yml)
 
-## Примечание
-
+Решатели дифференциальных уравнений в частных производных (и сопутствующий код) мигрированы на Java и перенесены в другой [репозиторий](https://github.com/andrei-punko/pde-solvers)
 
 ## Содержание
 
@@ -65,7 +64,3 @@
 - Метод молекулярной динамики
 
 - Решение ОДУ dU/dx = F(x,U) методом Рунге-Кутта 4 порядка
-
-- Решение параболического ДУ M(x,t,U)*U'_t = [K(x,t,U)*U'_x]'_x + V(x,t,U)*U'_x + F(x,t,U)
-
-- Решение гиперболического ДУ M(x,t,U)*U''_tt = K(x,t,U)*U''_xx + V(x,t,U)*U'_x + L(x,t,U)*U'_t + F(x,t,U)
