@@ -1,5 +1,17 @@
-.vs
-Debug/*
+# Build directories
+build/
+bin/
 
-.idea
+# Object files
+*.o
+
+# Executables
 *.exe
+
+# IDE directories
+.idea/
+.vscode/
+
+# OS specific files
+.DS_Store
+Thumbs.db
